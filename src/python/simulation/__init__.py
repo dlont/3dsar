@@ -23,10 +23,12 @@ from .planning.probability_maps import (
     ProbabilityRegion,
     IncidentType
 )
+from .sarenvironement.sar_pomdp_environement import EnhancedSAREnvironment
 
 __all__ = [
     'Drone', 'SearchTarget', 'Building', 'DroneStatus',
     'DistributedPOMDPSearchPlanner',
     'ProbabilityMapGenerator', 'PredefinedHypotheses', 
-    'SearchHypothesis', 'ProbabilityRegion', 'IncidentType'
+    'SearchHypothesis', 'ProbabilityRegion', 'IncidentType',
+    'EnhancedSAREnvironment'
 ]
