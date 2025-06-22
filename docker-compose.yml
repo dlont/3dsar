@@ -1,0 +1,65 @@
+services:
+  # Main development container
+  sar-pomdp-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sar-pomdp-dev
+    volumes:
+      - .:/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - SAR_POMDP_ENV=development
+    ports:
+      - "8000:8000"  # For future API
+      - "8888:8888"  # Jupyter notebook
+    networks:
+      - sar-network
+    # GPU support (comment out if no GPU)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    tty: true
+    stdin_open: true
+
+  # Basic PostgreSQL database
+  postgres:
+    image: postgres:15
+    container_name: sar-pomdp-postgres
+    environment:
+      POSTGRES_DB: sar_pomdp
+      POSTGRES_USER: sar_user
+      POSTGRES_PASSWORD: sar_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - sar-network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: sar-pomdp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sar-network
+    command: redis-server --appendonly yes
+
+networks:
+  sar-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

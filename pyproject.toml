@@ -1,0 +1,52 @@
+[tool.poetry]
+name = "sar-pomdp"
+version = "0.1.0"
+description = "Search and Rescue POMDP System"
+authors = ["SAR-POMDP Team"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+# === STEP 1: Known working packages ===
+numpy = "^1.24.0"
+scipy = "^1.11.0"
+matplotlib = "^3.7.0"
+pandas = "^2.0.0"
+jupyter = "^1.0.0"
+fastapi = "^0.100.0"
+uvicorn = "^0.23.0"
+sqlalchemy = "^2.0.0"
+redis = "^4.6.0"
+
+# === STEP 2: Only packages with guaranteed Ubuntu 24.04 + Python 3.12 support ===
+
+# Basic computer vision (should have wheels)
+pillow = "^10.0.0"
+
+# Core geospatial (these usually work)
+shapely = "^2.0.0"
+
+# Machine learning (reliable)
+scikit-learn = "^1.3.0"
+
+# Data structures and utilities
+networkx = "^3.1.0"
+h5py = "^3.9.0"
+
+# === STEP 3:
+trimesh = "^4.0.0"   # Lightweight mesh processing
+geopandas = "^0.14.0" # Geospatial data manipulation
+opencv-python = "^4.8.0"
+pomdp-py = "^1.3.0"           # POMDP framework
+
+# Development tools
+pytest = "^7.4.0"
+black = "^23.7.0"
+flake8 = "^6.0.0"
+click = "^8.1.0"
+tqdm = "^4.66.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
