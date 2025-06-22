@@ -315,12 +315,12 @@ class DistributedPOMDPSearchPlanner:
             angle = 2 * np.pi * i / num_candidates
             x = current_pos[0] + search_radius * np.cos(angle)
             y = current_pos[1] + search_radius * np.sin(angle)
-            z = 25.0  # Fixed optimal altitude for ground search
+            z = current_pos[2]  # Keep same altitude
             
             # Ensure within bounds
             x = np.clip(x, min_x + 50, max_x - 50)
             y = np.clip(y, min_y + 50, max_y - 50)
-            z = np.clip(z, 15, 35)  # Optimal ground search altitude
+            z = np.clip(z, 20, 100)
             
             candidates.append(np.array([x, y, z]))
         
@@ -381,11 +381,11 @@ class DistributedPOMDPSearchPlanner:
         """Generate a random search action as fallback"""
         min_x, min_y, max_x, max_y = bounds
         
-        # Random position within bounds at optimal search altitude
+        # Random position within bounds
         target_pos = np.array([
             np.random.uniform(min_x + 50, max_x - 50),
             np.random.uniform(min_y + 50, max_y - 50),
-            np.random.uniform(20, 30)  # Optimal ground search altitude range
+            np.random.uniform(30, 80)
         ])
         
         return Action(
@@ -541,7 +541,7 @@ class SARPOMDPEnvironment:
             initial_position = np.array([
                 np.random.uniform(min_x + 50, max_x - 50),
                 np.random.uniform(min_y + 50, max_y - 50),
-                25.0  # Lowered from 50m to 25m for better ground coverage
+                50.0
             ])
         
         drone = Drone(
@@ -774,7 +774,7 @@ class SARPOMDPEnvironment:
                     drone.status = DroneStatus.RETURNING
                     return_action = Action(
                         type=ActionType.RETURN_BASE,
-                        target_position=np.array([0, 0, 25]),  # Base at ground level + safe margin
+                        target_position=np.array([0, 0, 50]),  # Base at origin
                         priority=10.0
                     )
                     drone.current_action = return_action
@@ -832,11 +832,11 @@ class SARPOMDPEnvironment:
                     move_distance = min(drone.speed * self.update_interval, distance)
                     new_position = drone.position + direction * move_distance
                     
-                    # Ensure within bounds and optimal altitude for ground search
+                    # Ensure within bounds
                     min_x, min_y, max_x, max_y = self.bounds
                     new_position[0] = np.clip(new_position[0], min_x + 20, max_x - 20)
                     new_position[1] = np.clip(new_position[1], min_y + 20, max_y - 20)
-                    new_position[2] = np.clip(new_position[2], 15, 35)  # Optimal altitude: 15-35m above ground
+                    new_position[2] = np.clip(new_position[2], 20, 100)
                     
                     self.update_drone_position(drone.id, new_position)
         
@@ -959,14 +959,14 @@ def create_pomdp_demo_scenario():
     for i, (pos, size) in enumerate(building_positions):
         env.add_building(f"building_{i+1}", pos, size)
     
-    # Deploy drone fleet with POMDP capabilities at optimal search altitude
-    print("🚁 Deploying intelligent drone fleet at ground search altitude...")
+    # Deploy drone fleet with POMDP capabilities
+    print("🚁 Deploying intelligent drone fleet...")
     drone_start_positions = [
-        np.array([-100, -100, 25]),  # Lowered from 60m to 25m
-        np.array([100, -100, 25]),
-        np.array([-100, 100, 25]),
-        np.array([100, 100, 25]),
-        np.array([0, 0, 30]),  # Central coordinator slightly higher
+        np.array([-100, -100, 60]),
+        np.array([100, -100, 60]),
+        np.array([-100, 100, 60]),
+        np.array([100, 100, 60]),
+        np.array([0, 0, 80]),  # Central coordinator
     ]
     
     for i, start_pos in enumerate(drone_start_positions):

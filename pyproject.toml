@@ -19,6 +19,12 @@ uvicorn = "^0.23.0"
 sqlalchemy = "^2.0.0"
 redis = "^4.6.0"
 
+# === MATPLOTLIB GUI BACKENDS ===
+# Qt5 backend for matplotlib (most reliable)
+PyQt5 = "^5.15.0"
+# Alternative Qt backend
+# PyQt6 = { version = "^6.5.0", optional = true }
+
 # === STEP 2: Only packages with guaranteed Ubuntu 24.04 + Python 3.12 support ===
 
 # Basic computer vision (should have wheels)
@@ -34,7 +40,7 @@ scikit-learn = "^1.3.0"
 networkx = "^3.1.0"
 h5py = "^3.9.0"
 
-# === STEP 3:
+# === STEP 3: SAR-specific packages ===
 trimesh = "^4.0.0"   # Lightweight mesh processing
 geopandas = "^0.14.0" # Geospatial data manipulation
 opencv-python = "^4.8.0"
@@ -47,6 +53,45 @@ flake8 = "^6.0.0"
 click = "^8.1.0"
 tqdm = "^4.66.0"
 
+# === OPTIONAL EXTRAS FOR GUI SUPPORT ===
+[tool.poetry.extras]
+# GUI support with Qt5 (recommended)
+qt5 = ["PyQt5"]
+# GUI support with Qt6 (newer)
+qt6 = ["PyQt6"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+# === POETRY CONFIGURATION ===
+[tool.poetry.scripts]
+sar-demo = "sar_simulation.main:main"
+sar-probability-maps = "sar_simulation.planning.probability_maps:main"
+
+# === DEVELOPMENT CONFIGURATION ===
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=sar_simulation",
+    "--cov-report=term-missing",
+]
